@@ -1,0 +1,28 @@
+; Concepts illustrated:
+;   - Drawing black-and-white contours over a polar stereographic map
+;   - Drawing the northern hemisphere of a polar stereographic map
+;**************************************************************************
+
+begin
+	;read in NC data
+
+;	filedir = "/media/usb/Satellite/OMI/Trop-O3"
+	data1 = "omi_aura_tco_1x1_200410_201612_for_zhang.nc" ;TCO data
+	filedir1 = "/mnt/d/SeniorThesis/data/"
+	nc1 = addfile(filedir1 + data1,"r")
+	tco1 = nc1->tco(3:146,121:180,:)
+	
+	;the value is not supposed to be minus, so I assume the missing value is -999 after looking at the dataset
+	tco1@_FillValue = -999
+
+	;new a variable named tco1AvgTime with the same dimension of lat and lon.
+	tco1AvgTime = nc1->tco(0,121:180,:)
+
+	tco1AvgTime = dim_avg_n(tco1, 0)
+	
+	; create plot
+	wks = gsn_open_wks("png","polar")
+	res	= True
+	res@gsnPolar = "NH"
+	plot = gsn_csm_contour_map_polar(wks,tco1AvgTime,res)
+end
